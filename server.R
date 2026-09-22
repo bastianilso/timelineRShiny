@@ -14,9 +14,10 @@ options(shiny.maxRequestSize=50*1024^2)
 shinyServer(function(input, output, session) {
     
     df <- reactive ({
-        validate(need(!is.null(input$fileMeta) && !is.null(input$fileEvent) &&
+        validate(need(!is.null(input$fileMeta) | !is.null(input$fileEvent) |
                       !is.null(input$fileSample), Msg_nodata()),
                  need(input$visButton, "Press Visualize to start."))
+      
         LoadFromFilePaths(input$fileMeta$datapath, input$fileEvent$datapath, input$fileSample$datapath)
     })
     

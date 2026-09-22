@@ -3,12 +3,21 @@ library(dplyr)
 
 LoadFromFilePaths <- function(filePathMeta, filePathEvent, filePathSample) {
   print(filePathMeta)
-  dataset_meta <- read.csv(filePathMeta, na.strings="NULL", sep=";")
-  dataset_meta$fID = filePathMeta
-  dataset_event <- read.csv(filePathEvent, na.strings="NULL", sep=";")
-  dataset_event$fID = filePathEvent
-  dataset_sample <- read.csv(filePathSample, na.strings="NULL", sep=";")
-  dataset_event$fID = filePathSample
+  dataset_event = data.frame()
+  dataset_sample = data.frame()
+  dataset_meta = data.frame()
+  if (!is.null(filePathMeta)){
+    dataset_meta <- read.csv(filePathMeta, na.strings="NULL", sep=";")
+    dataset_meta$fID = filePathMeta
+  }
+  if (!is.null(filePathEvent)){
+    dataset_event <- read.csv(filePathEvent, na.strings="NULL", sep=";")
+    dataset_event$fID = filePathEvent
+  }
+  if (!is.null(filePathSample)){
+    dataset_sample <- read.csv(filePathSample, na.strings="NULL", sep=";")
+    dataset_sample$fID = filePathSample
+  }
   dataset_meta <- PreprocessMeta(dataset_meta)
   dataset <- MergeDatasets(dataset_meta, dataset_event, dataset_sample)
   return(dataset)
@@ -95,13 +104,17 @@ PreprocessMeta <- function(dataset_meta) {
 
 MergeDatasets <- function(dataset_meta, dataset_event, dataset_sample) {
   df = data.frame()
-
+  
   test = !is.null(dataset_meta[["SessionID"]])
   joinstring = ifelse(test, "SessionID", "fID")
   test = length(na.omit(unique(dataset_meta[["SessionID"]]))) == 1
   joinstring = ifelse(test, "SessionID", "fID")
+  test = nrow(dataset_meta) == 0
+  joinstring = ifelse(test, NA, joinstring)
 
-  if(joinstring != "fID") {
+  if (is.na(joinstring)) {
+    dataset_meta = NULL
+  } else if(joinstring != "fID") {
     # Remove fID from dataset_meta if we dont use it.
     dataset_meta = dataset_meta %>% mutate(fID = NULL) 
   } else {

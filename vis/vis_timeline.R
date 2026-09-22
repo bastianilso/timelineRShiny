@@ -29,12 +29,12 @@ vis_timeline <- function(df, col_time, col_event, col_eventtype, col_streams, ig
   timetemplate <- plot_ly() %>%
     config(scrollZoom = TRUE, displaylogo = FALSE, modeBarButtonsToRemove = c("select2d","hoverCompareCartesian", "toggleSpikelines","toImage", "sendDataToCloud", "editInChartStudio", "lasso2d", "drawclosedpath", "drawopenpath", "drawline", "drawcircle", "eraseshape", "autoScale2d", "hoverClosestCartesian","toggleHover", "")) %>%
     layout(dragmode = "pan", xaxis = list(tickformat="ms"), yaxis = list(range=c(0,1.1)))
-  
+
   if (col_eventtype == "") {
     col_eventtype = col_event
   }
-  
-  if (ignore_event != "") {
+
+  if (!is.null(ignore_event) && ignore_event != "") {
     df[[col_eventtype]] = as.character(df[[col_eventtype]])
     df[[col_eventtype]] <- ifelse(df[[col_eventtype]] %in% ignore_event, NA, df[[col_eventtype]])
   }
